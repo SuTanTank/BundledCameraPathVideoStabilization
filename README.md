@@ -7,5 +7,6 @@ This is a 3rd party implementation of the paper ___Bundled Camera Path Video Sta
 ## Usage:
 1. Extract frames of your video to a folder. The file names should be indexed properly. (e.g. ***001.png 002.png*** ...) `ffmpeg -i Input-Video-File-Name.mp4 Input_Frame_Path/%04d.png`
 2. Set the input and output path in `run.m`
-3. Set up the parameters, see comments for more detail. 
-4. run `run.m` 
+3. Set a temp path to store some intermediate result
+4. Set up the parameters, see comments for more detail.
+5. run `run.m` 
