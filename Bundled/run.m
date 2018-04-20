@@ -4,6 +4,7 @@
 addpath('mesh');
 addpath('RANSAC');
 addpath('mex');
+
 %% params
 inputDir = '../stable_data/frames/';
 outputDir = '../stable_data/resdemo/';
@@ -16,6 +17,7 @@ Cropping = 1; % adjust how similar the result to the original video, usually set
 iteration = 5; % number of iterations when optimizing the camera path
 % ---------------
 OutputPadding = 200; % the padding around the video, should be large enough. 
+
 %% Track by KLT
 tic;
 if ~exist([data 'tracks' int2str(TracksPerFrame) '.mat'], 'file')
@@ -26,6 +28,7 @@ else
 end
 toc;
 close all;
+
 %% Compute original camera path (by As-similar-as-possible Warping)
 % the rigidity can be controlled by setting asaplambda inside getPath.m
 tic;
