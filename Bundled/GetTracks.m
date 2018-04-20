@@ -38,16 +38,12 @@ function tracks = GetTracks( input, meshSize, demand)
         tracks.updatePoints(livePoints(validity & age, :), frameIndex);
         
         % end too old tracks 
-        
-        
         morePoints = getMorePoints(frame, meshSize, length(tracks.live), livePoints(validity == true, :), demand);
-%         morePoints = filtermask(frame, morePoints);
         tracks.addPoints(morePoints, frameIndex);
         livePoints = [livePoints(validity & age, :); morePoints];
         setPoints(tracker, livePoints);
         marked = insertMarker(frame, livePoints);
-        imshow(marked);
-        
+        imshow(marked);        
     end
     tracks.endPoints(false(length(tracks.live), 1), length(fileList) + 1);
 end

@@ -3,26 +3,23 @@
 % contact: sutank922@gmail.com
 addpath('mesh');
 addpath('RANSAC');
-addpath('stitch');
-addpath('peter');
 addpath('mex');
 %% params
-data = '../stable_data/';
-input = 'frames/';
+inputDir = '../stable_data/frames/';
+outputDir = '../stable_data/resdemo/';
 % ---------------
-TracksPerFrame = 2000; % # of trajectories in a frame
+TracksPerFrame = 2000; % number of trajectories in a frame, 200 - 2000 is OK
 % ---------------
-MeshSize = 8; % The mesh size of bundled camera path, 5 - 10 is OK
+MeshSize = 8; % The mesh size of bundled camera path, 6 - 12 is OK
 Smoothness = 1; % adjust how stable the output is, 0.5 - 3 is OK
-Cropping = 1; % adjust how similar the result to the original video, usually set to 1;
+Cropping = 1; % adjust how similar the result to the original video, usually set to 1
+iteration = 5; % number of iterations when optimizing the camera path
 % ---------------
-OutputPadding = 200; % the padding around the video
-OutputPath = 'res_demo'; % the directory to store the output frames, auto create it if not exist
-
+OutputPadding = 200; % the padding around the video, should be large enough. 
 %% Track by KLT
 tic;
 if ~exist([data 'tracks' int2str(TracksPerFrame) '.mat'], 'file')
-    track = GetTracks([data input], 10, TracksPerFrame); % 10 = tracks evenly distributed in 10*10 grids
+    track = GetTracks(inputDir, 10, TracksPerFrame); % 10 = tracks evenly distributed in 10*10 grids
     save([data 'tracks' int2str(TracksPerFrame) '.mat'], 'track');
 else
     load([data 'tracks' int2str(TracksPerFrame) '.mat']);
@@ -42,8 +39,7 @@ toc;
 
 %% Optimize the paths
 tic;
-bundled = Bundled([data input], path, Smoothness, Cropping);
-bundled.optPath(20);
-
-bundled.render([data OutputPath], OutputPadding);
+bundled = Bundled(inputDir, path, Smoothness, Cropping);
+bundled.optPath(iteration);
+bundled.render(outputDir, OutputPadding);
 toc;

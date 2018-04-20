@@ -204,7 +204,7 @@ classdef Bundled < handle
             obj.gap = gap;
             fileList = dir(obj.seq);
             fileList = fileList(3:length(fileList));                
-            parfor frameIndex = obj.span + 1 : obj.nFrames - obj.span + 1 %parfor
+            parfor frameIndex = obj.span + 1 : obj.nFrames - obj.span %parfor
                 disp(['rendering: # ' int2str(frameIndex)]);
                 fileName = fileList(frameIndex).name;                                
                 I = imread([obj.seq fileName]);                
