@@ -1,7 +1,4 @@
-classdef Bundled < handle
-    %VIDEOSTITCH Summary of this class goes here
-    %   Detailed explanation goes here
-    
+classdef Bundled < handle    
     properties
         % inputs
         seq;
@@ -213,11 +210,10 @@ classdef Bundled < handle
             end
         end
         
-        function imwarp = render1(obj, I, frameIndex, P, C, drawGrid)
+        function imwarp = render1(obj, I, frameIndex, P, C)
             src = Mesh(obj.videoHeight, obj.videoWidth, obj.quadWidth, obj.quadHeight);
             des = Mesh(obj.videoHeight, obj.videoWidth, obj.quadWidth, obj.quadHeight);
             
-            % ==============
             for i = 0 : obj.meshSize
                 for j = 0 : obj.meshSize
                     x = i * obj.quadHeight + 1;
@@ -353,8 +349,6 @@ classdef Bundled < handle
             imwarp = myWarp(minx,maxx,miny,maxy,double(im),imwarp,HH,obj.gap);
             imwarp = uint8(imwarp);            
         end
-        
-        
         
         function [x,y] = transform(~, xxyy, B)
             xx = xxyy(1); yy = xxyy(2);
