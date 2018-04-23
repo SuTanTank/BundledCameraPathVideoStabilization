@@ -29,10 +29,12 @@ function [ homos ] = NewWarping( pa_, pb_, H, W, qH, qW, lambda)
     valid = pbWarp(:, 1) > 0 & pbWarp(:, 1) < W & pbWarp(:, 2) > 0 & pbWarp(:, 2) < H;
     pa = pa_(valid & diff, :);
     pbWarp = pbWarp(valid & diff, :);
-    
-%     asap = AsSimilarAsPossible(pa, pbWarp, H, W, qW, qH, lambda);
+%     
+%     asap = AsSimilarAsPossibleWarping(H, W, qW, qH, lambda);
+%     asap.ADAPTIVE_WEIGHT = 0;
 %     asap.SetControlPts(pa, pbWarp);
 %     asap.Solve();
+%     homos3 = asap.CalcHomos();
     
 % -----DEBUG-SCRIPT------
 % use it to check the warping result
@@ -45,7 +47,7 @@ function [ homos ] = NewWarping( pa_, pb_, H, W, qH, qW, lambda)
 %         disp('?') ;
 %     end
 
-%     homos2 = asap.CalcHomos();
+    
     homos2 = AsSimilarAsPossible(pa, pbWarp, H, W, qH, qW, lambda);
     homos = homos2;
     for row = 1:H/qH

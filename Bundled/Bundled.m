@@ -35,11 +35,11 @@ classdef Bundled < handle
             obj.smoothness = smoothness;
             obj.cropping = cropping;            
             obj.stableW = 20;
-            obj.span = 30;
+            obj.span = 60;
             
 			fileList = dir(seq);
 			fileList = fileList(3:length(fileList));
-			obj.nFrames = length(fileList);
+			obj.nFrames = size(path, 1);
 			if obj.nFrames < 2
 				error('Wrong inputs directory') ;
 			end
@@ -51,7 +51,7 @@ classdef Bundled < handle
             obj.quadHeight = obj.videoHeight / obj.meshSize;
             obj.quadWidth = obj.videoWidth / obj.meshSize;
             
-            obj.w = zeros(obj.nFrames, obj.nFrames, obj.meshSize, obj.meshSize);
+            obj.w = zeros(obj.nFrames, 2 * obj.span + 1, obj.meshSize, obj.meshSize);
             
             obj.gamma = zeros(obj.nFrames, obj.meshSize, obj.meshSize);            
         end
@@ -61,13 +61,14 @@ classdef Bundled < handle
                 for j = 1:obj.meshSize
                     for t = 1:obj.nFrames                        
                         for r = t-obj.span:t+obj.span
-                            if t > obj.span && t <= obj.nFrames - obj.span
+%                             if t > obj.span && t <= obj.nFrames - obj.span
                                 if r > 0 && r <= obj.nFrames
+                                    r_offset = r - t + obj.span + 1;
                                     dP = abs(obj.C(t,i,j,1,3) - obj.C(r,i,j,1,3)) + abs(obj.C(t,i,j,2,3) - obj.C(r,i,j,2,3));                                
-                                    obj.w(t,r,i,j) = gaussmf(abs(t-r), [10 0]) * gaussmf(dP, [400 0]);
-                                    obj.w(t,t,i,j) = 0;        
+                                    obj.w(t,r_offset,i,j) = gaussmf(abs(t-r), [10 0]) * gaussmf(dP, [800 0]);
+                                    obj.w(t,obj.span + 1,i,j) = 0;        
                                 end
-                            end
+%                             end
                         end
                         obj.gamma(t,i,j) = sum(obj.w(t,:,i,j)) * 2 * obj.smoothness;                        
                         obj.gamma(t,i,j) = obj.gamma(t,i,j) + 1;                        
@@ -172,7 +173,7 @@ classdef Bundled < handle
             for inIte = 1:maxIte
                 fprintf('.');
                 oP = obj.P;                
-                for frameIndex = 1:obj.nFrames                        
+                for frameIndex = 1:obj.nFrames
                     for row = 1:obj.meshSize
                         for col = 1:obj.meshSize
                             head = max(frameIndex - obj.span, 1);
@@ -182,7 +183,7 @@ classdef Bundled < handle
                             value = squeeze(oP(frameIndex, row, col, :, :));                            
                             % Pat - Par
                             n9 = reshape(oP(head:tail, row, col, :, :), [nn, 9]);
-                            weight = obj.w(frameIndex, head:tail, row, col);
+                            weight = obj.w(frameIndex, head - frameIndex + obj.span + 1:tail - frameIndex + obj.span + 1, row, col);
                             value = value + 2 * obj.smoothness * reshape(weight * n9, [3, 3]);
                             % Pat - Pat
                             value = value + obj.getCoherenceTerm(obj.C, oP, row, col, frameIndex);
@@ -201,11 +202,11 @@ classdef Bundled < handle
             obj.gap = gap;
             fileList = dir(obj.seq);
             fileList = fileList(3:length(fileList));                
-            parfor frameIndex = obj.span + 1 : obj.nFrames - obj.span %parfor
+            parfor frameIndex = 1 : obj.nFrames %parfor
                 disp(['rendering: # ' int2str(frameIndex)]);
                 fileName = fileList(frameIndex).name;                                
                 I = imread([obj.seq fileName]);                
-                warp = obj.render1(I, frameIndex, obj.P, obj.C, 0);                
+                warp = obj.render1(I, frameIndex, obj.P, obj.C);                
                 imwrite(uint8(warp), [outPath '/' int2str(frameIndex) '.bmp']);                
             end
         end

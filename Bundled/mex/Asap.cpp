@@ -153,6 +153,7 @@ namespace Asap
 					p.y = x(i * width + j + columns / 2);
 					destin.setVertex(i, j, p);
 				}
+			
 		}
 		//checkBadCPs();
 		return 0;
@@ -160,7 +161,7 @@ namespace Asap
 
 	vector<vector<Homography>> Asap::calcHomos()
 	{
-		vector<vector<Homography>> homos;
+		vector<vector<Homography>> homos;		
 		for (int row = 0; row < height - 1; ++row)
 		{
 			vector<Homography> homoRow;
@@ -277,7 +278,7 @@ namespace Asap
 				count++;
 			}
 		}
-		double threshold = max(sum/count * 5, 2.0);					
+		double threshold = max(sum/(count + 0.00001) * 5, 2.0);					
 		assert(dataElement_i.size() == ncp);
 		vector<int> _dataElement_i;
 		vector<int> _dataElement_j;

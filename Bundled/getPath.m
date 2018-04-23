@@ -20,8 +20,8 @@ function path = getPath(MeshSize, tracks)
         end                
         quadH = tracks.videoHeight / MeshSize;
         quadW = tracks.videoWidth / MeshSize;
-        asaplambda = 1;
-        [I1_features,I2_features] = tracks.getAllF(frameIndex - 1);
+        asaplambda = 3;
+        [I1_features,I2_features] = tracks.getF(frameIndex - 1);
         homos = NewWarping(I1_features, I2_features, tracks.videoHeight, tracks.videoWidth, quadH, quadW, asaplambda);
         for i = 1:MeshSize
             for j = 1:MeshSize
