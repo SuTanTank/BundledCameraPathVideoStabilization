@@ -36,7 +36,7 @@ classdef TrackLib < handle
         function addPoints(obj, newPoints, frameIndex)
             nNew = size(newPoints, 1);
             if (size(obj.points, 1) < obj.nTrack + nNew)
-                obj.points = [obj.points; zeros(1000, obj.nFrame, 2)];            
+                obj.points = [obj.points; zeros(50000, obj.nFrame, 2)];            
             end           
             obj.points(obj.nTrack + 1:obj.nTrack + nNew, frameIndex, :) = reshape(newPoints, [nNew, 1, 2]) / obj.scale;            
             obj.live = [obj.live obj.nTrack + 1: obj.nTrack + nNew];            
