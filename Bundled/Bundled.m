@@ -28,14 +28,14 @@ classdef Bundled < handle
     end
     
     methods
-        function obj = Bundled(seq, path, smoothness, cropping)
+        function obj = Bundled(seq, path, span, smoothness, cropping, rigidity)
             obj.seq = seq;
             obj.C = path;            
             obj.P = obj.C;            
             obj.smoothness = smoothness;
             obj.cropping = cropping;            
-            obj.stableW = 20;
-            obj.span = 60;
+            obj.stableW = 20 * rigidity;
+            obj.span = span;
             
 			fileList = dir(seq);
 			fileList = fileList(3:length(fileList));
@@ -202,7 +202,7 @@ classdef Bundled < handle
             obj.gap = gap;
             fileList = dir(obj.seq);
             fileList = fileList(3:length(fileList));                
-            parfor frameIndex = 1 : obj.nFrames %parfor
+            for frameIndex = 1 : obj.nFrames %parfor
                 disp(['rendering: # ' int2str(frameIndex)]);
                 fileName = fileList(frameIndex).name;                                
                 I = imread([obj.seq fileName]);                
