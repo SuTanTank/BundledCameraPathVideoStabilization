@@ -2,6 +2,7 @@ classdef Bundled < handle
     properties
         % inputs
         seq;
+        resize;
         % Dimensions
         nFrames;        
         videoHeight;
@@ -28,8 +29,9 @@ classdef Bundled < handle
     end
     
     methods
-        function obj = Bundled(seq, path, span, smoothness, cropping, rigidity)
+        function obj = Bundled(seq, resize, path, span, smoothness, cropping, rigidity)
             obj.seq = seq;
+            obj.resize = resize;
             obj.C = path;            
             obj.P = obj.C;            
             obj.smoothness = smoothness;
@@ -44,6 +46,7 @@ classdef Bundled < handle
 				error('Wrong inputs directory') ;
 			end
 			frame = imread([seq fileList(1).name]);
+            frame = imresize(frame, resize);
 		
             [obj.videoHeight, obj.videoWidth, ~] = size(frame);
             [~, obj.meshSize, ~, ~, ~] = size(path);
@@ -205,9 +208,10 @@ classdef Bundled < handle
             for frameIndex = 1 : obj.nFrames %parfor
                 disp(['rendering: # ' int2str(frameIndex)]);
                 fileName = fileList(frameIndex).name;                                
-                I = imread([obj.seq fileName]);                
+                I = imread([obj.seq fileName]);  
+                I = imresize(I, obj.resize);
                 warp = obj.render1(I, frameIndex, obj.P, obj.C);                
-                imwrite(uint8(warp), [outPath '/' int2str(frameIndex) '.bmp']);                
+                imwrite(uint8(warp), [outPath '/' int2str(frameIndex) '.jpg']);                
             end
         end
         

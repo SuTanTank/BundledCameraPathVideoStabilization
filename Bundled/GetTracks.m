@@ -1,4 +1,4 @@
-function tracks = GetTracks( input, meshSize, demand, nFrames)
+function tracks = GetTracks( input, resize, meshSize, demand, nFrames)
 %GetTracks Compute tracks by KLT
 %   Use KLT to track evenly fistributed track points
 %   input: the path to images
@@ -16,6 +16,8 @@ function tracks = GetTracks( input, meshSize, demand, nFrames)
     tracker = vision.PointTracker('MaxBidirectionalError', 1);
     fileName = fileList(1).name;
     frame = imread([input fileName]);
+    frame = imresize(frame, resize);
+    
     [H, W, ~] = size(frame);    
     tracks.videoWidth = W;    
     tracks.videoHeight = H;
@@ -36,6 +38,7 @@ function tracks = GetTracks( input, meshSize, demand, nFrames)
         end        
         fileName = fileList(frameIndex).name;
         frame = imread([input fileName]);
+        frame = imresize(frame, resize);
         frame_s = imresize(frame, tracks.scale);
         
         
@@ -74,17 +77,19 @@ function pointsMore = getMorePoints(frame, meshSize, nP, oldpoints, demand)
         for col = 1:meshSize
             if votes(row, col) < demand * 0.8
                 nMore = floor(demand - votes(row, col));
-                roi = [1 + (col - 1) * W / meshSize, 1 + (row - 1) * H / meshSize, W / meshSize - 1, H / meshSize - 1];                
-                pNew = detectMinEigenFeatures(rgb2gray(frame), 'ROI', roi, 'MinQuality', threshold); 
-                while (size(pNew, 1) < nMore) && threshold > 0.1
-                    threshold = threshold - 0.1; 
-                    threshold = max(threshold, 0);
+                if nMore > 0
+                    roi = [1 + (col - 1) * W / meshSize, 1 + (row - 1) * H / meshSize, W / meshSize - 1, H / meshSize - 1];                
                     pNew = detectMinEigenFeatures(rgb2gray(frame), 'ROI', roi, 'MinQuality', threshold); 
+                    while (size(pNew, 1) < nMore) && threshold > 0.1
+                        threshold = threshold - 0.1; 
+                        threshold = max(threshold, 0);
+                        pNew = detectMinEigenFeatures(rgb2gray(frame), 'ROI', roi, 'MinQuality', threshold); 
+                    end
+                    if nMore < size(pNew, 1)
+                        pNew = pNew.selectStrongest(nMore);
+                    end
+                    points = [points; pNew.Location];
                 end
-                if nMore < size(pNew, 1)
-                    pNew = pNew.selectStrongest(nMore);
-                end
-                points = [points; pNew.Location];
             end
         end
     end
